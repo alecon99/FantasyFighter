@@ -47,60 +47,25 @@ namespace FantasyFighter
             
             // stop game
         }
-
-        /// <summary>
-        /// this should not be done
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        private static bool IsPlayerNameValid(string name, out string result)
+        
+        private class PlayerNameCheckResult
         {
-            if (string.IsNullOrWhiteSpace(name))
+            public bool IsValid { get; }
+            
+            public string ErrorMessage { get; }
+
+            public PlayerNameCheckResult(bool isValid, string errorMessage)
             {
-                result = "The name cannot be empty or white spaces";
-                return false;
+                IsValid = isValid;
+                ErrorMessage = errorMessage;
             }
-
-            string[] prohibitedWords = new string[]
-            {
-                ".",
-                ",",
-                ";",
-                ":"
-            };
-
-            foreach (string prohibitedWord in prohibitedWords)
-            {
-                if (name.Contains(prohibitedWord))
-                {
-                    result = $"The name cannot include {prohibitedWord}";
-                    return false;
-                }
-            }
-            
-            /*if (name.Contains("."))
-                return false;
-            
-            if (name.Contains(","))
-                return false;
-            
-            if (name.Contains(";"))
-                return false;
-            
-            if (name.Contains(":"))
-                return false;*/
-
-            result = "Name is ok";
-            return true;
         }
         
-        private static bool IsPlayerNameValid(string name)
+        private PlayerNameCheckResult IsPlayerNameValid(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                result = "The name cannot be empty or white spaces";
-                return false;
+                return new PlayerNameCheckResult(false,"The name cannot be empty or white spaces");
             }
             
             string[] prohibitedWords = new string[]
@@ -115,13 +80,11 @@ namespace FantasyFighter
             {
                 if (name.Contains(prohibitedWord))
                 {
-                    result = $"The name cannot include {prohibitedWord}";
-                    return false;
+                    return new PlayerNameCheckResult(false,$"The name cannot include {prohibitedWord}");
                 }
             }
-
-            result = "Name is ok";
-            return true;
+            
+            return new PlayerNameCheckResult(true,"Name is ok");
         }
         
         private string GetPlayerName()
@@ -129,9 +92,11 @@ namespace FantasyFighter
             Console.WriteLine("Please choose your name");
             var name = Console.ReadLine();
 
-            if (!IsPlayerNameValid(name, out string errorMessage))
+            var playerNameCheck = IsPlayerNameValid(name);
+
+            if (!playerNameCheck.IsValid)
             {
-                Console.WriteLine(errorMessage);
+                Console.WriteLine(playerNameCheck.ErrorMessage);
             }
             
             //TODO: richiedere il nome al giocatore
